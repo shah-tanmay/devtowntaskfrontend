@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Grid,
   MenuItem,
   Pagination,
@@ -15,10 +16,13 @@ import axios from "../../axiosInstance";
 import { generateBills } from "../../helpers";
 import Header from "../Header";
 import Toast from "../Toast";
+import { Link, useNavigate } from "react-router-dom";
+
 const Bill = () => {
   const email = localStorage.getItem("email");
   const token = localStorage.getItem("token");
   const [bills, setBills] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [fetch, setFetch] = useState(false);
   const [page, setPage] = useState();
   const [skip, setSkip] = useState(0);
@@ -56,6 +60,7 @@ const Bill = () => {
     setFetch(!fetch);
   };
   useEffect(() => {
+    setLoading(true);
     const getBills = () => {
       axios
         .get(`getBill/?skip=${skip}&sortBy=${filter}`, {
@@ -71,9 +76,11 @@ const Bill = () => {
             ? (count = count / 5)
             : (count = Math.floor(count / 5) + 1);
           setPage(count);
+          setLoading(false);
         })
         .catch((error) => {
           console.log(error);
+          setLoading(false);
           setOpen(false);
           setMessage("Some Error Occured");
           setSeverity("error");
@@ -90,52 +97,83 @@ const Bill = () => {
         text={message}
         severity={severity}
       />
-      <Grid container direction="row" gap={2} marginTop={5}>
-        <Typography textAlign="center" variant="h4">
-          Filter According To:-{" "}
-        </Typography>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={filter}
-          label="Filters"
-          onChange={handleFilterChange}
-        >
-          <MenuItem value="amount">Amount</MenuItem>
-          <MenuItem value="unitsConsumed">Units Consumed</MenuItem>
-          <MenuItem value="dueDate">Due Date</MenuItem>
-          <MenuItem value="pendingAmount">Pending Amount</MenuItem>
-        </Select>
-        <Button onClick={generateFakeBillData}>Generate Fake Bill Data </Button>
-      </Grid>
-      <Grid container direction="row" gap={2}>
-        {bills.map((bill) => {
-          return (
-            <div>
-              <Card sx={{ minWidth: "500px", maxWidth: "500px" }}>
-                <CardContent>
-                  <Typography variant="h6">Title: {bill.title}</Typography>
-                  <Typography variant="h6">Amount: {bill.amount}</Typography>
-                  <Typography variant="h6">
-                    Untis Consumed: {bill.unitsConsumed}
-                  </Typography>
-                  <Typography variant="h6">
-                    Due Date: {new Date(bill.dueDate).toString()}
-                  </Typography>
-                  <Typography variant="h6">
-                    Pending Amount: {bill.pendingAmount}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </div>
-          );
-        })}
-      </Grid>
-      {page > 0 && (
-        <Grid container justifyContent="center" marginTop={3} page={page}>
-          <Pagination count={page} onChange={handlePageChange} />
+      <>
+        <Grid container direction="row" gap={2} marginTop={5}>
+          <Typography textAlign="center" variant="h4">
+            Filter According To:-{" "}
+          </Typography>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={filter}
+            label="Filters"
+            onChange={handleFilterChange}
+          >
+            <MenuItem value="amount">Amount</MenuItem>
+            <MenuItem value="unitsConsumed">Units Consumed</MenuItem>
+            <MenuItem value="dueDate">Due Date</MenuItem>
+            <MenuItem value="pendingAmount">Pending Amount</MenuItem>
+          </Select>
+          <Button onClick={generateFakeBillData}>
+            Generate Fake Bill Data{" "}
+          </Button>
+          <Link
+            to="/addBill"
+            style={{
+              marginTop: "10px",
+              textDecoration: "none",
+            }}
+          >
+            <Button>Add Bills Manually</Button>
+          </Link>
         </Grid>
-      )}
+        {loading == true ? (
+          <Grid
+            container
+            direction="row"
+            justifyContent="center"
+            width="100vw"
+            marginX="auto"
+          >
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <>
+            <Grid container direction="row" gap={2}>
+              {bills.map((bill) => {
+                return (
+                  <div>
+                    <Card sx={{ minWidth: "500px", maxWidth: "500px" }}>
+                      <CardContent>
+                        <Typography variant="h6">
+                          Title: {bill.title}
+                        </Typography>
+                        <Typography variant="h6">
+                          Amount: {bill.amount}
+                        </Typography>
+                        <Typography variant="h6">
+                          Untis Consumed: {bill.unitsConsumed}
+                        </Typography>
+                        <Typography variant="h6">
+                          Due Date: {new Date(bill.dueDate).toString()}
+                        </Typography>
+                        <Typography variant="h6">
+                          Pending Amount: {bill.pendingAmount}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
+            </Grid>
+          </>
+        )}
+        {loading == false && page > 0 && (
+          <Grid container justifyContent="center" marginTop={3} page={page}>
+            <Pagination count={page} onChange={handlePageChange} />
+          </Grid>
+        )}
+      </>
     </div>
   );
 };

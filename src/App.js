@@ -4,9 +4,9 @@ import Bill from "./components/Bill";
 import Login from "./components/Login";
 import Forgot from "./components/Forgot";
 import Reset from "./components/Reset";
+import AddBill from "./components/AddBill";
 
 function App() {
-  // const email = localStorage.getItem("email");
   return (
     <div>
       <Routes>
@@ -14,6 +14,7 @@ function App() {
         <Route path="/reset" element={<Reset />} />
         <Route path="/forgot" element={<Forgot />} />
         <Route path="/bill" element={<Bill />} />
+        <Route path="/addbill" element={<AddBill />} />
       </Routes>
     </div>
   );

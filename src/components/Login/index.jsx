@@ -34,8 +34,10 @@ const Login = () => {
         .then((response) => {
           const token = response.data.token;
           const email = response.data.user.email;
+          const id = response.data.user._id;
           localStorage.setItem("token", token);
           localStorage.setItem("email", email);
+          localStorage.setItem("id", id);
           setOpen(true);
           navigate("bill");
         })
@@ -76,7 +78,7 @@ const Login = () => {
       direction="column"
       justifyContent="center"
       alignItems="center"
-      sx={{ minWidth: 400, minHeight: "80vh" }}
+      sx={{ minWidth: 400, minHeight: "100vh" }}
     >
       <Toast
         open={open}
